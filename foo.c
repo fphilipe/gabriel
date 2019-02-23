@@ -132,13 +132,13 @@ int *possible_moves(int **map, int width, int height, int x, int y) {
   int *moves = calloc(4, sizeof(int));
   int u;
   for (u = 0; u < 4; u++) {
-    moves[u] = 1;
+    moves[u] = 0;
   }
 
-  if (x-1 > 0)      { moves[LEFT]  = map[y][x-1]; }
-  if (y-1 > 0)      { moves[UP]    = map[y-1][x]; }
-  if (x+1 < width)  { moves[RIGHT] = map[y][x+1]; }
-  if (y+1 < height) { moves[DOWN]  = map[y+1][x]; }
+  if (x-1 > 0)      { moves[LEFT]  = map[y][x-1] == 0; }
+  if (y-1 > 0)      { moves[UP]    = map[y-1][x] == 0; }
+  if (x+1 < width)  { moves[RIGHT] = map[y][x+1] == 0; }
+  if (y+1 < height) { moves[DOWN]  = map[y+1][x] == 0; }
 
   return moves;
 }
@@ -147,35 +147,33 @@ void explore(int **map, int width, int height) {
   char input;
   int x = 1;
   int y = 1;
-  int *move = calloc(4, sizeof(int));
   while (input != 'q') {
     print_map(map, width, height);
     printf("\nChoose your next action (wasd - q to exit):\n");
     scanf("\n");
     scanf("%1c", &input);
-    move = possible_moves(map, width, height, x, y);
-    /* array example:  {1,1,0,1}   0 is open, 1 is wall*/
+    int *can_move = possible_moves(map, width, height, x, y);
     switch (input) {
       case 'a':
-        if (move[LEFT] == 0) {
+        if (can_move[LEFT]) {
           x -= 1;
           map[y][x+1] = 0;
           map[y][x] = 2;
         } break;
       case 'w':
-        if (move[UP] == 0) {
+        if (can_move[UP]) {
           y -= 1;
           map[y+1][x] = 0;
           map[y][x] = 2;
         } break;
       case 'd':
-        if (move[RIGHT] == 0) {
+        if (can_move[RIGHT]) {
           x += 1;
           map[y][x-1] = 0;
           map[y][x] = 2;
         } break;
       case 's':
-        if (move[DOWN] == 0) {
+        if (can_move[DOWN]) {
           y += 1;
           map[y-1][x] = 0;
           map[y][x] = 2;

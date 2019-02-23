@@ -8,8 +8,8 @@
 #define RIGHT 2
 #define DOWN  3
 
-#define PATH   0
-#define WALL   1
+#define WALL   0
+#define PATH   1
 #define PLAYER 2
 #define TARGET 3
 
@@ -58,8 +58,8 @@ void print_map(int **map, int width, int height) {
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       switch (map[y][x]) {
-        case PATH:   printf(" "); break;
         case WALL:   printf("#"); break;
+        case PATH:   printf(" "); break;
         case PLAYER: printf("K"); break;
         case TARGET: printf("O"); break;
       }
@@ -72,12 +72,6 @@ int **generate_map(int width, int height) {
   int **map = calloc(height, sizeof(int *));
   for (int y = 0; y < height; y++) {
     map[y] = calloc(width, sizeof(int));
-  }
-
-  for (int y = 0; y < height; y++) {
-    for (int x = 0; x < width; x++) {
-      map[y][x] = WALL;
-    }
   }
 
   map[1][1] = PLAYER;

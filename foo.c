@@ -4,6 +4,8 @@
 #include <string.h>
 
 /*-----------------FUNCTIONS-------------------*/
+int prompt_size();
+
 void print_map(int **map, int dim);
 
 int **generate_map(int size);
@@ -19,19 +21,8 @@ void explore(int **map, int dim);
 
 int main() {
   srand(time(NULL));
-  int size;
 
-  // Asking for the size
-  while (1) {
-    printf("Size of the map? (odd number)\n");
-    scanf("%d%*c", &size);
-    if (size % 2 == 1) {
-      break;
-    } else {
-      printf("Even number entered!\n");
-    }
-  }
-
+  int size = prompt_size();
   int **map = generate_map(size);
 
   explore(map, size);
@@ -39,6 +30,19 @@ int main() {
 }
 
 /*---------------------------------------------*/
+int prompt_size() {
+  int size;
+  while (1) {
+    printf("Size of the map? (odd number)\n");
+    scanf("%d%*c", &size);
+    if (size % 2 == 1) {
+      return size;
+    } else {
+      printf("Even number entered!\n");
+    }
+  }
+}
+
 void print_map(int **map, int dim) {
   int i, j;
   for (i = 0; i < dim; i++) {

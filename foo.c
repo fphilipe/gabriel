@@ -16,7 +16,7 @@ int *check_holes(int **map, int m, int n, int i, int j);
 
 int *possible_moves(int **map, int m, int n, int i, int j);
 
-void explore(int **map, int dim);
+void explore(int **map, int width, int height);
 /* -------------------MAIN---------------------*/
 
 int main() {
@@ -25,7 +25,7 @@ int main() {
   int size = prompt_size();
   int **map = generate_map(size);
 
-  explore(map, size);
+  explore(map, size, size);
   return 0;
 }
 
@@ -164,16 +164,16 @@ int *possible_moves(int **map, int m, int n, int i, int j) {
   return moves;
 }
 
-void explore(int **map, int dim) {
+void explore(int **map, int width, int height) {
   char input;
   int i = 1, j = 1;
   int *move = calloc(4, sizeof(int));
   while (input != 'q') {
-    print_map(map, dim, dim);
+    print_map(map, width, height);
     printf("\nChoose your next action (wasd - q to exit):\n");
     scanf("\n");
     scanf("%1c", &input);
-    move = possible_moves(map, dim, dim, i, j);
+    move = possible_moves(map, width, height, i, j);
     /* array example:  {1,1,0,1}   0 is open, 1 is wall*/
     /* move[4] = move[sx,up,dx,down] */
     switch (input) {

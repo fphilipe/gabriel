@@ -38,11 +38,11 @@ void alloc_map(Map *map, int width, int height);
 
 void free_map(Map *map);
 
-void generate_map(Map *map);
-
-void dig(Map *map, Position *pos);
+void generate_labyrinth(Map *map);
 
 int can_dig(int dir, Map *map, Position *pos);
+
+void dig(int dir, Map *map, Position *pos);
 
 int can_move(int dir, Map *map, Position *pos);
 
@@ -63,7 +63,7 @@ int main() {
   int height = prompt_size("Height");
   Map map;
   alloc_map(&map, width, height);
-  generate_map(&map);
+  generate_labyrinth(&map);
 
   explore(&map);
 
@@ -114,39 +114,29 @@ void free_map(Map *map) {
   free(map->cells);
 }
 
-void generate_map(Map *map) {
+void generate_labyrinth(Map *map) {
   Position pos = { .x = 1, .y = 1 };
   map->cells[pos.x][pos.y] = player;
-  dig(map, &pos);
-}
 
-void dig(Map *map, Position *pos) {
-  int r, w;
-  int n_to_dig = 0;
-
-  int where_to_dig[4];
-
-  for (int dir = 0; dir < 4; dir++) {
-    if (can_dig(dir, map, pos)) {
-      where_to_dig[n_to_dig] = dir;
-      n_to_dig += 1;
+  while (1) {
+    int n_to_dig = 0;
+    int where_to_dig[4];
+    for (int dir = 0; dir < 4; dir++) {
+      if (can_dig(dir, map, &pos)) {
+        where_to_dig[n_to_dig] = dir;
+        n_to_dig += 1;
+      }
     }
-  }
-  if (n_to_dig == 0) { //no more possible adjacent possible holes to dig
-    map->cells[pos->y][pos->x] = target;
-    return;
-  } else { //random choice among possible ways of digging
-    r = rand() % n_to_dig;
-    w = where_to_dig[r];
-    //digging
-    switch (w) {
-      case left:  pos->x -= 2; map->cells[pos->y][pos->x+1] = path; break;
-      case up:    pos->y -= 2; map->cells[pos->y+1][pos->x] = path; break;
-      case right: pos->x += 2; map->cells[pos->y][pos->x-1] = path; break;
-      case down:  pos->y += 2; map->cells[pos->y-1][pos->x] = path; break;
+    if (n_to_dig == 0) { //no more possible adjacent possible holes to dig
+      map->cells[pos.y][pos.x] = target;
+      break;
+    } else { //random choice among possible ways of digging
+      int r = rand() % n_to_dig;
+      int dir = where_to_dig[r];
+      // We always dig two cells at a time:
+      dig(dir, map, &pos);
+      dig(dir, map, &pos);
     }
-    map->cells[pos->y][pos->x] = path;
-    return dig(map, pos);
   }
 }
 
@@ -158,6 +148,17 @@ int can_dig(int dir, Map *map, Position *pos) {
     case down:  return (pos->y+2 < map->height) && map->cells[pos->y+2][pos->x] == wall;
     default: abort();
   }
+}
+
+void dig(int dir, Map *map, Position *pos) {
+  switch (dir) {
+    case left:  pos->x -= 1; break;
+    case up:    pos->y -= 1; break;
+    case right: pos->x += 1; break;
+    case down:  pos->y += 1; break;
+    default: abort();
+  }
+  map->cells[pos->y][pos->x] = path;
 }
 
 int can_move(int dir, Map *map, Position *pos) {

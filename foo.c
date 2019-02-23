@@ -24,6 +24,11 @@ typedef struct {
   char **cells;
 } Map;
 
+typedef struct {
+  int x;
+  int y;
+} Position;
+
 /*-----------------FUNCTIONS-------------------*/
 int prompt_size(char *label);
 
@@ -31,17 +36,17 @@ void print_map(Map *map);
 
 Map *generate_map(int width, int height);
 
-void dig(Map *map, int x, int y);
+void dig(Map *map, Position *pos);
 
-int can_dig(int dir, Map *map, int x, int y);
+int can_dig(int dir, Map *map, Position *pos);
 
-int can_move(int dir, Map *map, int x, int y);
+int can_move(int dir, Map *map, Position *pos);
 
 void explore(Map *map);
 
 int directionForKey(char key);
 
-void move(int dir, Map *map, int *x, int *y);
+void move(int dir, Map *map, Position *pos);
 
 /* -------------------MAIN---------------------*/
 
@@ -93,66 +98,66 @@ Map *generate_map(int width, int height) {
     }
   }
 
-  map->cells[1][1] = player;
-  dig(map, 1, 1);
+  Position pos = { .x = 1, .y = 1 };
+  map->cells[pos.x][pos.y] = player;
+  dig(map, &pos);
 
   return map;
 }
 
-void dig(Map *map, int x, int y) {
+void dig(Map *map, Position *pos) {
   int r, w;
   int n_to_dig = 0;
 
   int where_to_dig[4];
 
   for (int dir = 0; dir < 4; dir++) {
-    if (can_dig(dir, map, x, y)) {
+    if (can_dig(dir, map, pos)) {
       where_to_dig[n_to_dig] = dir;
       n_to_dig += 1;
     }
   }
   if (n_to_dig == 0) { //no more possible adjacent possible holes to dig
-    map->cells[y][x] = target;
+    map->cells[pos->y][pos->x] = target;
     return;
   } else { //random choice among possible ways of digging
     r = rand() % n_to_dig;
     w = where_to_dig[r];
     //digging
     switch (w) {
-      case left:  x -= 2; map->cells[y][x+1] = path; break;
-      case up:    y -= 2; map->cells[y+1][x] = path; break;
-      case right: x += 2; map->cells[y][x-1] = path; break;
-      case down:  y += 2; map->cells[y-1][x] = path; break;
+      case left:  pos->x -= 2; map->cells[pos->y][pos->x+1] = path; break;
+      case up:    pos->y -= 2; map->cells[pos->y+1][pos->x] = path; break;
+      case right: pos->x += 2; map->cells[pos->y][pos->x-1] = path; break;
+      case down:  pos->y += 2; map->cells[pos->y-1][pos->x] = path; break;
     }
-    map->cells[y][x] = path;
-    return dig(map, x, y);
+    map->cells[pos->y][pos->x] = path;
+    return dig(map, pos);
   }
 }
 
-int can_dig(int dir, Map *map, int x, int y) {
+int can_dig(int dir, Map *map, Position *pos) {
   switch (dir) {
-    case left:  return (x-2 > 0)           && map->cells[y][x-2] == wall;
-    case up:    return (y-2 > 0)           && map->cells[y-2][x] == wall;
-    case right: return (x+2 < map->width)  && map->cells[y][x+2] == wall;
-    case down:  return (y+2 < map->height) && map->cells[y+2][x] == wall;
+    case left:  return (pos->x-2 > 0)           && map->cells[pos->y][pos->x-2] == wall;
+    case up:    return (pos->y-2 > 0)           && map->cells[pos->y-2][pos->x] == wall;
+    case right: return (pos->x+2 < map->width)  && map->cells[pos->y][pos->x+2] == wall;
+    case down:  return (pos->y+2 < map->height) && map->cells[pos->y+2][pos->x] == wall;
     default: abort();
   }
 }
 
-int can_move(int dir, Map *map, int x, int y) {
+int can_move(int dir, Map *map, Position *pos) {
   switch (dir) {
-    case left:  return (x-1 > 0)           && map->cells[y][x-1] == path;
-    case up:    return (y-1 > 0)           && map->cells[y-1][x] == path;
-    case right: return (x+1 < map->width)  && map->cells[y][x+1] == path;
-    case down:  return (y+1 < map->height) && map->cells[y+1][x] == path;
+    case left:  return (pos->x-1 > 0)           && map->cells[pos->y][pos->x-1] == path;
+    case up:    return (pos->y-1 > 0)           && map->cells[pos->y-1][pos->x] == path;
+    case right: return (pos->x+1 < map->width)  && map->cells[pos->y][pos->x+1] == path;
+    case down:  return (pos->y+1 < map->height) && map->cells[pos->y+1][pos->x] == path;
     default: abort();
   }
 }
 
 void explore(Map *map) {
   char input;
-  int x = 1;
-  int y = 1;
+  Position pos = {1, 1};
   while (input != 'q') {
     print_map(map);
     printf("\nChoose your next action (wasd - q to exit):\n");
@@ -165,8 +170,8 @@ void explore(Map *map) {
       case keyDown:
         {
           int dir = directionForKey(input);
-          if (can_move(dir, map, x, y))
-            move(dir, map, &x, &y);
+          if (can_move(dir, map, &pos))
+            move(dir, map, &pos);
           break;
         }
       case keyQuit: break;
@@ -186,34 +191,34 @@ int directionForKey(char key) {
   }
 }
 
-void move(int dir, Map *map, int *x, int *y) {
+void move(int dir, Map *map, Position *pos) {
   switch (dir) {
     case left:
       {
-        *x -= 1;
-        map->cells[*y][*x+1] = path;
-        map->cells[*y][*x] = player;
+        pos->x -= 1;
+        map->cells[pos->y][pos->x+1] = path;
+        map->cells[pos->y][pos->x] = player;
         break;
       }
     case up:
       {
-        *y -= 1;
-        map->cells[*y+1][*x] = path;
-        map->cells[*y][*x] = player;
+        pos->y -= 1;
+        map->cells[pos->y+1][pos->x] = path;
+        map->cells[pos->y][pos->x] = player;
         break;
       }
     case right:
       {
-        *x += 1;
-        map->cells[*y][*x-1] = path;
-        map->cells[*y][*x] = player;
+        pos->x += 1;
+        map->cells[pos->y][pos->x-1] = path;
+        map->cells[pos->y][pos->x] = player;
         break;
       }
     case down:
       {
-        *y += 1;
-        map->cells[*y-1][*x] = path;
-        map->cells[*y][*x] = player;
+        pos->y += 1;
+        map->cells[pos->y-1][pos->x] = path;
+        map->cells[pos->y][pos->x] = player;
         break;
       }
   }

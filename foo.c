@@ -10,7 +10,7 @@ void print_map(int **map, int width, int height);
 
 int **generate_map(int width, int height);
 
-int **gen_labirinth(int **map, int width, int height, int i, int j);
+int **dig(int **map, int width, int height, int i, int j);
 
 int *check_holes(int **map, int width, int height, int i, int j);
 
@@ -75,10 +75,10 @@ int **generate_map(int width, int height) {
     }
   }
   map[i][j] = 2;
-  return gen_labirinth(map, width, height, i, j);
+  return dig(map, width, height, i, j);
 }
 
-int **gen_labirinth(int **map, int width, int height, int i, int j) {
+int **dig(int **map, int width, int height, int i, int j) {
   /*       i and j position of hole digger          */
   int u;
   int r, w;
@@ -110,7 +110,7 @@ int **gen_labirinth(int **map, int width, int height, int i, int j) {
       case 3: i += 2; map[i-1][j] = 0; break;
     }
     map[i][j] = 0;
-    return gen_labirinth(map, width, height, i, j);
+    return dig(map, width, height, i, j);
   }
 }
 

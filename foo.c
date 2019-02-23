@@ -22,8 +22,15 @@ int main(){
   int size;
 
   // Asking for the size
-  printf("Size of the map? (odd number)\n");
-  scanf("%d%*c", &size);
+  while (1) {
+    printf("Size of the map? (odd number)\n");
+    scanf("%d%*c", &size);
+    if (size % 2 == 1) {
+      break;
+    } else {
+      printf("Even number entered!\n");
+    }
+  }
 
   int** map = generate_map(size);
 

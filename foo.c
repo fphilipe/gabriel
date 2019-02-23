@@ -3,6 +3,11 @@
 #include <time.h>
 #include <string.h>
 
+#define LEFT  0
+#define UP    1
+#define RIGHT 2
+#define DOWN  3
+
 /*-----------------FUNCTIONS-------------------*/
 int prompt_size(char *label);
 
@@ -80,8 +85,6 @@ int **dig(int **map, int width, int height, int x, int y) {
   int r, w;
   int n_to_dig = 0;
 
-  /*  creating an array of possible movements for the digger: */
-  /*    - 0 sx      - 1 up      - 2 dx       - 3 down         */
   int where_to_dig[4];
 
   int *free_to_dig = check_holes(map, width, height, x, y);
@@ -116,22 +119,12 @@ int *check_holes(int **map, int width, int height, int x, int y) {
   for (u = 0; u < 4; u++) {
     dig[u] = 0;
   }
-  //checking if sx if free to go
-  if (x-2 > 0) {
-    dig[0] = map[y][x-2];
-  }
-  //checking if up is free to go
-  if (y-2 > 0) {
-    dig[1] = map[y-2][x];
-  }
-  //checking if dx is free to go
-  if (x+2 < width) {
-    dig[2] = map[y][x+2];
-  }
-  //checking if down is free to go
-  if (y+2 < height) {
-    dig[3] = map[y+2][x];
-  }
+
+  if (x-2 > 0)      { dig[LEFT]  = map[y][x-2]; }
+  if (y-2 > 0)      { dig[UP]    = map[y-2][x]; }
+  if (x+2 < width)  { dig[RIGHT] = map[y][x+2]; }
+  if (y+2 < height) { dig[DOWN]  = map[y+2][x]; }
+
   return dig;
 }
 
@@ -141,22 +134,12 @@ int *possible_moves(int **map, int width, int height, int x, int y) {
   for (u = 0; u < 4; u++) {
     moves[u] = 1;
   }
-  //checking if sx if free to go
-  if (x-1 > 0) {
-    moves[0] = map[y][x-1];
-  }
-  //checking if up is free to go
-  if (y-1 > 0) {
-    moves[1] = map[y-1][x];
-  }
-  //checking if dx is free to go
-  if (x+1 < width) {
-    moves[2] = map[y][x+1];
-  }
-  //checking if down is free to go
-  if (y+1 < height) {
-    moves[3] = map[y+1][x];
-  }
+
+  if (x-1 > 0)      { moves[LEFT]  = map[y][x-1]; }
+  if (y-1 > 0)      { moves[UP]    = map[y-1][x]; }
+  if (x+1 < width)  { moves[RIGHT] = map[y][x+1]; }
+  if (y+1 < height) { moves[DOWN]  = map[y+1][x]; }
+
   return moves;
 }
 
@@ -172,30 +155,29 @@ void explore(int **map, int width, int height) {
     scanf("%1c", &input);
     move = possible_moves(map, width, height, x, y);
     /* array example:  {1,1,0,1}   0 is open, 1 is wall*/
-    /* move[4] = move[sx,up,dx,down] */
     switch (input) {
-      case 'w':
-        if (move[1] == 0) {
-          y -= 1;
-          map[y+1][x] = 0;
-          map[y][x] = 2;
-        } break;
       case 'a':
-        if (move[0] == 0) {
+        if (move[LEFT] == 0) {
           x -= 1;
           map[y][x+1] = 0;
           map[y][x] = 2;
         } break;
-      case 's':
-        if (move[3] == 0) {
-          y += 1;
-          map[y-1][x] = 0;
+      case 'w':
+        if (move[UP] == 0) {
+          y -= 1;
+          map[y+1][x] = 0;
           map[y][x] = 2;
         } break;
       case 'd':
-        if (move[2] == 0) {
+        if (move[RIGHT] == 0) {
           x += 1;
           map[y][x-1] = 0;
+          map[y][x] = 2;
+        } break;
+      case 's':
+        if (move[DOWN] == 0) {
+          y += 1;
+          map[y-1][x] = 0;
           map[y][x] = 2;
         } break;
       case 'q': break;

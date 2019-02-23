@@ -5,6 +5,13 @@
 
 enum direction { left, up, right, down };
 enum cell_type { wall, path, player, target };
+enum keys {
+  keyLeft  = 'a',
+  keyUp    = 'w',
+  keyRight = 'd',
+  keyDown  = 's',
+  keyQuit  = 'q'
+};
 
 /*-----------------FUNCTIONS-------------------*/
 int prompt_size(char *label);
@@ -136,31 +143,31 @@ void explore(int **map, int width, int height) {
     scanf("%1c", &input);
     int *can_move = possible_moves(map, width, height, x, y);
     switch (input) {
-      case 'a':
+      case keyLeft:
         if (can_move[left]) {
           x -= 1;
           map[y][x+1] = path;
           map[y][x] = player;
         } break;
-      case 'w':
+      case keyUp:
         if (can_move[up]) {
           y -= 1;
           map[y+1][x] = path;
           map[y][x] = player;
         } break;
-      case 'd':
+      case keyRight:
         if (can_move[right]) {
           x += 1;
           map[y][x-1] = path;
           map[y][x] = player;
         } break;
-      case 's':
+      case keyDown:
         if (can_move[down]) {
           y += 1;
           map[y-1][x] = path;
           map[y][x] = player;
         } break;
-      case 'q': break;
+      case keyQuit: break;
       default: continue;
     }
   }

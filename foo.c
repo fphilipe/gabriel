@@ -6,7 +6,7 @@
 /*-----------------FUNCTIONS-------------------*/
 int prompt_size();
 
-void print_map(int **map, int dim);
+void print_map(int **map, int width, int height);
 
 int **generate_map(int size);
 
@@ -43,10 +43,10 @@ int prompt_size() {
   }
 }
 
-void print_map(int **map, int dim) {
+void print_map(int **map, int width, int height) {
   int i, j;
-  for (i = 0; i < dim; i++) {
-    for (j = 0; j < dim; j++) {
+  for (i = 0; i < height; i++) {
+    for (j = 0; j < width; j++) {
       if (map[i][j] == 3) {
         printf("O");
       } else if (map[i][j] == 2) {
@@ -169,7 +169,7 @@ void explore(int **map, int dim) {
   int i = 1, j = 1;
   int *move = calloc(4, sizeof(int));
   while (input != 'q') {
-    print_map(map, dim);
+    print_map(map, dim, dim);
     printf("\nChoose your next action (wasd - q to exit):\n");
     scanf("\n");
     scanf("%1c", &input);

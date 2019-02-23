@@ -100,10 +100,10 @@ int **dig(int **map, int width, int height, int x, int y) {
     w = where_to_dig[r];
     //digging
     switch (w) {
-      case 0: x -= 2; map[y][x+1] = path; break;
-      case 1: y -= 2; map[y+1][x] = path; break;
-      case 2: x += 2; map[y][x-1] = path; break;
-      case 3: y += 2; map[y-1][x] = path; break;
+      case left:  x -= 2; map[y][x+1] = path; break;
+      case up:    y -= 2; map[y+1][x] = path; break;
+      case right: x += 2; map[y][x-1] = path; break;
+      case down:  y += 2; map[y-1][x] = path; break;
     }
     map[y][x] = path;
     return dig(map, width, height, x, y);

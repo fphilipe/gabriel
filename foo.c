@@ -27,6 +27,10 @@ int *possible_digs(int **map, int width, int height, int x, int y);
 int *possible_moves(int **map, int width, int height, int x, int y);
 
 void explore(int **map, int width, int height);
+
+int directionForKey(char key);
+
+void move(int dir, int **map, int *x, int *y);
 /* -------------------MAIN---------------------*/
 
 int main() {
@@ -144,32 +148,61 @@ void explore(int **map, int width, int height) {
     int *can_move = possible_moves(map, width, height, x, y);
     switch (input) {
       case keyLeft:
-        if (can_move[left]) {
-          x -= 1;
-          map[y][x+1] = path;
-          map[y][x] = player;
-        } break;
       case keyUp:
-        if (can_move[up]) {
-          y -= 1;
-          map[y+1][x] = path;
-          map[y][x] = player;
-        } break;
       case keyRight:
-        if (can_move[right]) {
-          x += 1;
-          map[y][x-1] = path;
-          map[y][x] = player;
-        } break;
       case keyDown:
-        if (can_move[down]) {
-          y += 1;
-          map[y-1][x] = path;
-          map[y][x] = player;
-        } break;
+        {
+          int dir = directionForKey(input);
+          if (can_move[dir])
+            move(dir, map, &x, &y);
+          break;
+        }
       case keyQuit: break;
       default: continue;
     }
   }
   return;
+}
+
+int directionForKey(char key) {
+  switch (key) {
+    case keyLeft:  return left;
+    case keyUp:    return up;
+    case keyRight: return right;
+    case keyDown:  return down;
+    default: abort();
+  }
+}
+
+void move(int dir, int **map, int *x, int *y) {
+  switch (dir) {
+    case left:
+      {
+        *x -= 1;
+        map[*y][*x+1] = path;
+        map[*y][*x] = player;
+        break;
+      }
+    case up:
+      {
+        *y -= 1;
+        map[*y+1][*x] = path;
+        map[*y][*x] = player;
+        break;
+      }
+    case right:
+      {
+        *x += 1;
+        map[*y][*x-1] = path;
+        map[*y][*x] = player;
+        break;
+      }
+    case down:
+      {
+        *y += 1;
+        map[*y-1][*x] = path;
+        map[*y][*x] = player;
+        break;
+      }
+  }
 }

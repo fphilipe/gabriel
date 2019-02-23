@@ -10,11 +10,11 @@ void print_map(int **map, int width, int height);
 
 int **generate_map(int width, int height);
 
-int **dig(int **map, int width, int height, int i, int j);
+int **dig(int **map, int width, int height, int x, int y);
 
-int *check_holes(int **map, int width, int height, int i, int j);
+int *check_holes(int **map, int width, int height, int x, int y);
 
-int *possible_moves(int **map, int width, int height, int i, int j);
+int *possible_moves(int **map, int width, int height, int x, int y);
 
 void explore(int **map, int width, int height);
 /* -------------------MAIN---------------------*/
@@ -45,14 +45,14 @@ int prompt_size(char *label) {
 }
 
 void print_map(int **map, int width, int height) {
-  int i, j;
-  for (i = 0; i < height; i++) {
-    for (j = 0; j < width; j++) {
-      if (map[i][j] == 3) {
+  int x, y;
+  for (y = 0; y < height; y++) {
+    for (x = 0; x < width; x++) {
+      if (map[y][x] == 3) {
         printf("O");
-      } else if (map[i][j] == 2) {
+      } else if (map[y][x] == 2) {
         printf("K");
-      } else if (map[i][j] == 1) {
+      } else if (map[y][x] == 1) {
         printf("#");
       } else {
         printf(" ");
@@ -64,7 +64,8 @@ void print_map(int **map, int width, int height) {
 
 int **generate_map(int width, int height) {
   int p, q;
-  int i = 1, j = 1;
+  int x = 1;
+  int y = 1;
   int **map = calloc(height, sizeof(int *));
   for (p = 0; p < height; p++) {
     map[p] = calloc(width, sizeof(int));
@@ -74,12 +75,11 @@ int **generate_map(int width, int height) {
       map[p][q] = 1;
     }
   }
-  map[i][j] = 2;
-  return dig(map, width, height, i, j);
+  map[y][x] = 2;
+  return dig(map, width, height, x, y);
 }
 
-int **dig(int **map, int width, int height, int i, int j) {
-  /*       i and j position of hole digger          */
+int **dig(int **map, int width, int height, int x, int y) {
   int u;
   int r, w;
   int n_to_dig = 0;
@@ -88,7 +88,7 @@ int **dig(int **map, int width, int height, int i, int j) {
   /*    - 0 sx      - 1 up      - 2 dx       - 3 down         */
   int where_to_dig[4];
 
-  int *free_to_dig = check_holes(map, width, height, i, j);
+  int *free_to_dig = check_holes(map, width, height, x, y);
 
   for (u = 0; u < 4; u++) {
     if (free_to_dig[u] == 1) {
@@ -97,109 +97,110 @@ int **dig(int **map, int width, int height, int i, int j) {
     }
   }
   if (n_to_dig == 0) { //no more possible adjacent possible holes to dig
-    map[i][j] = 3;
+    map[y][x] = 3;
     return map;
   } else { //random choice among possible ways of digging
     r = rand() % n_to_dig;
     w = where_to_dig[r];
     //digging
     switch (w) {
-      case 0: j -= 2; map[i][j+1] = 0; break;
-      case 1: i -= 2; map[i+1][j] = 0; break;
-      case 2: j += 2; map[i][j-1] = 0; break;
-      case 3: i += 2; map[i-1][j] = 0; break;
+      case 0: x -= 2; map[y][x+1] = 0; break;
+      case 1: y -= 2; map[y+1][x] = 0; break;
+      case 2: x += 2; map[y][x-1] = 0; break;
+      case 3: y += 2; map[y-1][x] = 0; break;
     }
-    map[i][j] = 0;
-    return dig(map, width, height, i, j);
+    map[y][x] = 0;
+    return dig(map, width, height, x, y);
   }
 }
 
-int *check_holes(int **map, int width, int height, int i, int j) {
+int *check_holes(int **map, int width, int height, int x, int y) {
   int *dig = calloc(4, sizeof(int));
   int u;
   for (u = 0; u < 4; u++) {
     dig[u] = 0;
   }
   //checking if sx if free to go
-  if (j-2 > 0) {
-    dig[0] = map[i][j-2];
+  if (x-2 > 0) {
+    dig[0] = map[y][x-2];
   }
   //checking if up is free to go
-  if (i-2 > 0) {
-    dig[1] = map[i-2][j];
+  if (y-2 > 0) {
+    dig[1] = map[y-2][x];
   }
   //checking if dx is free to go
-  if (j+2 < width) {
-    dig[2] = map[i][j+2];
+  if (x+2 < width) {
+    dig[2] = map[y][x+2];
   }
   //checking if down is free to go
-  if (i+2 < height) {
-    dig[3] = map[i+2][j];
+  if (y+2 < height) {
+    dig[3] = map[y+2][x];
   }
   return dig;
 }
 
-int *possible_moves(int **map, int width, int height, int i, int j) {
+int *possible_moves(int **map, int width, int height, int x, int y) {
   int *moves = calloc(4, sizeof(int));
   int u;
   for (u = 0; u < 4; u++) {
     moves[u] = 1;
   }
   //checking if sx if free to go
-  if (j-1 > 0) {
-    moves[0] = map[i][j-1];
+  if (x-1 > 0) {
+    moves[0] = map[y][x-1];
   }
   //checking if up is free to go
-  if (i-1 > 0) {
-    moves[1] = map[i-1][j];
+  if (y-1 > 0) {
+    moves[1] = map[y-1][x];
   }
   //checking if dx is free to go
-  if (j+1 < width) {
-    moves[2] = map[i][j+1];
+  if (x+1 < width) {
+    moves[2] = map[y][x+1];
   }
   //checking if down is free to go
-  if (i+1 < height) {
-    moves[3] = map[i+1][j];
+  if (y+1 < height) {
+    moves[3] = map[y+1][x];
   }
   return moves;
 }
 
 void explore(int **map, int width, int height) {
   char input;
-  int i = 1, j = 1;
+  int x = 1;
+  int y = 1;
   int *move = calloc(4, sizeof(int));
   while (input != 'q') {
     print_map(map, width, height);
     printf("\nChoose your next action (wasd - q to exit):\n");
     scanf("\n");
     scanf("%1c", &input);
-    move = possible_moves(map, width, height, i, j);
+    move = possible_moves(map, width, height, x, y);
     /* array example:  {1,1,0,1}   0 is open, 1 is wall*/
     /* move[4] = move[sx,up,dx,down] */
     switch (input) {
       case 'w':
         if (move[1] == 0) {
-          i -= 1;
-          map[i+1][j] = 0;
-          map[i][j] = 2;
+          y -= 1;
+          map[y+1][x] = 0;
+          map[y][x] = 2;
         } break;
       case 'a':
         if (move[0] == 0) {
-          j -= 1;
-          map[i][j+1] = 0;
-          map[i][j] = 2;
+          x -= 1;
+          map[y][x+1] = 0;
+          map[y][x] = 2;
         } break;
       case 's':
         if (move[3] == 0) {
-          i += 1;
-          map[i-1][j] = 0;
-          map[i][j] = 2;
+          y += 1;
+          map[y-1][x] = 0;
+          map[y][x] = 2;
         } break;
       case 'd':
         if (move[2] == 0) {
-          j += 1;
-          map[i][j-1] = 0;
-          map[i][j] = 2;
+          x += 1;
+          map[y][x-1] = 0;
+          map[y][x] = 2;
         } break;
       case 'q': break;
       default: continue;

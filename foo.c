@@ -81,17 +81,15 @@ int **generate_map(int width, int height) {
 }
 
 int **dig(int **map, int width, int height, int x, int y) {
-  int u;
   int r, w;
   int n_to_dig = 0;
 
   int where_to_dig[4];
 
   int *can_dig = possible_digs(map, width, height, x, y);
-
-  for (u = 0; u < 4; u++) {
-    if (can_dig[u] == 1) {
-      where_to_dig[n_to_dig] = u;
+  for (int dir = 0; dir < 4; dir++) {
+    if (can_dig[dir]) {
+      where_to_dig[n_to_dig] = dir;
       n_to_dig += 1;
     }
   }

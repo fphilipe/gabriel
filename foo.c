@@ -22,10 +22,11 @@ void explore(int **map, int width, int height);
 int main() {
   srand(time(NULL));
 
-  int size = prompt_size("Size");
-  int **map = generate_map(size);
+  int width = prompt_size("Width");
+  int height = prompt_size("Height");
+  int **map = generate_map(width, height);
 
-  explore(map, size, size);
+  explore(map, width, height);
   return 0;
 }
 

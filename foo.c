@@ -13,24 +13,26 @@ enum keys {
   keyQuit  = 'q'
 };
 
+typedef int ** Map;
+
 /*-----------------FUNCTIONS-------------------*/
 int prompt_size(char *label);
 
-void print_map(int **map, int width, int height);
+void print_map(Map map, int width, int height);
 
-int **generate_map(int width, int height);
+Map generate_map(int width, int height);
 
-int **dig(int **map, int width, int height, int x, int y);
+Map dig(Map map, int width, int height, int x, int y);
 
-int can_dig(int dir, int **map, int width, int height, int x, int y);
+int can_dig(int dir, Map map, int width, int height, int x, int y);
 
-int can_move(int dir, int **map, int width, int height, int x, int y);
+int can_move(int dir, Map map, int width, int height, int x, int y);
 
-void explore(int **map, int width, int height);
+void explore(Map map, int width, int height);
 
 int directionForKey(char key);
 
-void move(int dir, int **map, int *x, int *y);
+void move(int dir, Map map, int *x, int *y);
 /* -------------------MAIN---------------------*/
 
 int main() {
@@ -38,7 +40,7 @@ int main() {
 
   int width = prompt_size("Width");
   int height = prompt_size("Height");
-  int **map = generate_map(width, height);
+  Map map = generate_map(width, height);
 
   explore(map, width, height);
   return 0;
@@ -58,7 +60,7 @@ int prompt_size(char *label) {
   }
 }
 
-void print_map(int **map, int width, int height) {
+void print_map(Map map, int width, int height) {
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       switch (map[y][x]) {
@@ -72,8 +74,8 @@ void print_map(int **map, int width, int height) {
   }
 }
 
-int **generate_map(int width, int height) {
-  int **map = calloc(height, sizeof(int *));
+Map generate_map(int width, int height) {
+  Map map = calloc(height, sizeof(int *));
   for (int y = 0; y < height; y++) {
     map[y] = calloc(width, sizeof(int));
   }
@@ -83,7 +85,7 @@ int **generate_map(int width, int height) {
   return dig(map, width, height, 1, 1);
 }
 
-int **dig(int **map, int width, int height, int x, int y) {
+Map dig(Map map, int width, int height, int x, int y) {
   int r, w;
   int n_to_dig = 0;
 
@@ -123,7 +125,7 @@ int can_dig(int dir, Map map, int width, int height, int x, int y) {
   }
 }
 
-int can_move(int dir, int **map, int width, int height, int x, int y) {
+int can_move(int dir, Map map, int width, int height, int x, int y) {
   switch (dir) {
     case left:  return (x-1 > 0)      && map[y][x-1] == path;
     case up:    return (y-1 > 0)      && map[y-1][x] == path;
@@ -133,7 +135,7 @@ int can_move(int dir, int **map, int width, int height, int x, int y) {
   }
 }
 
-void explore(int **map, int width, int height) {
+void explore(Map map, int width, int height) {
   char input;
   int x = 1;
   int y = 1;
@@ -170,7 +172,7 @@ int directionForKey(char key) {
   }
 }
 
-void move(int dir, int **map, int *x, int *y) {
+void move(int dir, Map map, int *x, int *y) {
   switch (dir) {
     case left:
       {

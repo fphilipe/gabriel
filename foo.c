@@ -4,7 +4,7 @@
 #include <string.h>
 
 /*-----------------FUNCTIONS-------------------*/
-int prompt_size();
+int prompt_size(char *label);
 
 void print_map(int **map, int width, int height);
 
@@ -22,7 +22,7 @@ void explore(int **map, int width, int height);
 int main() {
   srand(time(NULL));
 
-  int size = prompt_size();
+  int size = prompt_size("Size");
   int **map = generate_map(size);
 
   explore(map, size, size);
@@ -30,10 +30,10 @@ int main() {
 }
 
 /*---------------------------------------------*/
-int prompt_size() {
+int prompt_size(char *label) {
   int size;
   while (1) {
-    printf("Size of the map? (odd number)\n");
+    printf("%s of the map? (odd number)\n", label);
     scanf("%d%*c", &size);
     if (size % 2 == 1) {
       return size;

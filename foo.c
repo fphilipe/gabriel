@@ -42,6 +42,8 @@ int can_dig(int dir, Map *map, Position *pos);
 
 int can_move(int dir, Map *map, Position *pos);
 
+int reaches_target(int dir, Map *map, Position *pos);
+
 void explore(Map *map);
 
 int directionForKey(char key);
@@ -155,6 +157,16 @@ int can_move(int dir, Map *map, Position *pos) {
   }
 }
 
+int reaches_target(int dir, Map *map, Position *pos) {
+  switch (dir) {
+    case left:  return map->cells[pos->y][pos->x-1] == target;
+    case up:    return map->cells[pos->y-1][pos->x] == target;
+    case right: return map->cells[pos->y][pos->x+1] == target;
+    case down:  return map->cells[pos->y+1][pos->x] == target;
+    default: abort();
+  }
+}
+
 void explore(Map *map) {
   char input;
   Position pos = {1, 1};
@@ -170,8 +182,14 @@ void explore(Map *map) {
       case keyDown:
         {
           int dir = directionForKey(input);
-          if (can_move(dir, map, &pos))
+          if (can_move(dir, map, &pos)) {
             move(dir, map, &pos);
+          } else if (reaches_target(dir, map, &pos)) {
+            move(dir, map, &pos);
+            print_map(map);
+            printf("Congrats!\n");
+            return;
+          }
           break;
         }
       case keyQuit: break;

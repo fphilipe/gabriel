@@ -10,11 +10,11 @@ void print_map(int **map, int width, int height);
 
 int **generate_map(int size);
 
-int **gen_labirinth(int **map, int m, int n, int i, int j);
+int **gen_labirinth(int **map, int width, int height, int i, int j);
 
-int *check_holes(int **map, int m, int n, int i, int j);
+int *check_holes(int **map, int width, int height, int i, int j);
 
-int *possible_moves(int **map, int m, int n, int i, int j);
+int *possible_moves(int **map, int width, int height, int i, int j);
 
 void explore(int **map, int width, int height);
 /* -------------------MAIN---------------------*/
@@ -77,8 +77,7 @@ int **generate_map(int size) {
   return gen_labirinth(map, size, size, i, j);
 }
 
-int **gen_labirinth(int **map, int m, int n, int i, int j) {
-  /*   m and n dimensions of the map, odd numbers   */
+int **gen_labirinth(int **map, int width, int height, int i, int j) {
   /*       i and j position of hole digger          */
   int u;
   int r, w;
@@ -88,7 +87,7 @@ int **gen_labirinth(int **map, int m, int n, int i, int j) {
   /*    - 0 sx      - 1 up      - 2 dx       - 3 down         */
   int where_to_dig[4];
 
-  int *free_to_dig = check_holes(map, m, n, i, j);
+  int *free_to_dig = check_holes(map, width, height, i, j);
 
   for (u = 0; u < 4; u++) {
     if (free_to_dig[u] == 1) {
@@ -110,11 +109,11 @@ int **gen_labirinth(int **map, int m, int n, int i, int j) {
       case 3: i += 2; map[i-1][j] = 0; break;
     }
     map[i][j] = 0;
-    return gen_labirinth(map, m, n, i, j);
+    return gen_labirinth(map, width, height, i, j);
   }
 }
 
-int *check_holes(int **map, int m, int n, int i, int j) {
+int *check_holes(int **map, int width, int height, int i, int j) {
   int *dig = calloc(4, sizeof(int));
   int u;
   for (u = 0; u < 4; u++) {
@@ -129,17 +128,17 @@ int *check_holes(int **map, int m, int n, int i, int j) {
     dig[1] = map[i-2][j];
   }
   //checking if dx is free to go
-  if (j+2 < n) {
+  if (j+2 < width) {
     dig[2] = map[i][j+2];
   }
   //checking if down is free to go
-  if (i+2 < m) {
+  if (i+2 < height) {
     dig[3] = map[i+2][j];
   }
   return dig;
 }
 
-int *possible_moves(int **map, int m, int n, int i, int j) {
+int *possible_moves(int **map, int width, int height, int i, int j) {
   int *moves = calloc(4, sizeof(int));
   int u;
   for (u = 0; u < 4; u++) {
@@ -154,11 +153,11 @@ int *possible_moves(int **map, int m, int n, int i, int j) {
     moves[1] = map[i-1][j];
   }
   //checking if dx is free to go
-  if (j+1 < n) {
+  if (j+1 < width) {
     moves[2] = map[i][j+1];
   }
   //checking if down is free to go
-  if (i+1 < m) {
+  if (i+1 < height) {
     moves[3] = map[i+1][j];
   }
   return moves;

@@ -115,10 +115,6 @@ int **dig(int **map, int width, int height, int x, int y) {
 
 int *check_holes(int **map, int width, int height, int x, int y) {
   int *dig = calloc(4, sizeof(int));
-  int u;
-  for (u = 0; u < 4; u++) {
-    dig[u] = 0;
-  }
 
   if (x-2 > 0)      { dig[LEFT]  = map[y][x-2]; }
   if (y-2 > 0)      { dig[UP]    = map[y-2][x]; }
@@ -130,10 +126,6 @@ int *check_holes(int **map, int width, int height, int x, int y) {
 
 int *possible_moves(int **map, int width, int height, int x, int y) {
   int *moves = calloc(4, sizeof(int));
-  int u;
-  for (u = 0; u < 4; u++) {
-    moves[u] = 0;
-  }
 
   if (x-1 > 0)      { moves[LEFT]  = map[y][x-1] == 0; }
   if (y-1 > 0)      { moves[UP]    = map[y-1][x] == 0; }

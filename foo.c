@@ -22,7 +22,7 @@ int **generate_map(int width, int height);
 
 int **dig(int **map, int width, int height, int x, int y);
 
-int *possible_digs(int **map, int width, int height, int x, int y);
+int can_dig(int dir, int **map, int width, int height, int x, int y);
 
 int can_move(int dir, int **map, int width, int height, int x, int y);
 
@@ -89,9 +89,8 @@ int **dig(int **map, int width, int height, int x, int y) {
 
   int where_to_dig[4];
 
-  int *can_dig = possible_digs(map, width, height, x, y);
   for (int dir = 0; dir < 4; dir++) {
-    if (can_dig[dir]) {
+    if (can_dig(dir, map, width, height, x, y)) {
       where_to_dig[n_to_dig] = dir;
       n_to_dig += 1;
     }
@@ -114,15 +113,14 @@ int **dig(int **map, int width, int height, int x, int y) {
   }
 }
 
-int *possible_digs(int **map, int width, int height, int x, int y) {
-  int *dig = calloc(4, sizeof(int));
-
-  if (x-2 > 0)      { dig[left]  = map[y][x-2] == wall; }
-  if (y-2 > 0)      { dig[up]    = map[y-2][x] == wall; }
-  if (x+2 < width)  { dig[right] = map[y][x+2] == wall; }
-  if (y+2 < height) { dig[down]  = map[y+2][x] == wall; }
-
-  return dig;
+int can_dig(int dir, Map map, int width, int height, int x, int y) {
+  switch (dir) {
+    case left:  return (x-2 > 0)      && map[y][x-2] == wall;
+    case up:    return (y-2 > 0)      && map[y-2][x] == wall;
+    case right: return (x+2 < width)  && map[y][x+2] == wall;
+    case down:  return (y+2 < height) && map[y+2][x] == wall;
+    default: abort();
+  }
 }
 
 int can_move(int dir, int **map, int width, int height, int x, int y) {

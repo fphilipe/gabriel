@@ -4,7 +4,12 @@
 #include <string.h>
 
 enum direction { left, up, right, down };
-enum cell_type { wall, path, player, target };
+enum cell_type {
+  wall   = '#',
+  path   = ' ',
+  player = 'K',
+  target = 'O'
+};
 enum keys {
   keyLeft  = 'a',
   keyUp    = 'w',
@@ -13,7 +18,7 @@ enum keys {
   keyQuit  = 'q'
 };
 
-typedef int ** Map;
+typedef char ** Map;
 
 /*-----------------FUNCTIONS-------------------*/
 int prompt_size(char *label);
@@ -63,21 +68,19 @@ int prompt_size(char *label) {
 void print_map(Map map, int width, int height) {
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
-      switch (map[y][x]) {
-        case wall:   printf("#"); break;
-        case path:   printf(" "); break;
-        case player: printf("K"); break;
-        case target: printf("O"); break;
-      }
+      printf("%c", map[y][x]);
     }
     printf("\n");
   }
 }
 
 Map generate_map(int width, int height) {
-  Map map = calloc(height, sizeof(int *));
+  Map map = calloc(height, sizeof(char *));
   for (int y = 0; y < height; y++) {
-    map[y] = calloc(width, sizeof(int));
+    map[y] = calloc(width, sizeof(char));
+    for (int x = 0; x < width; x++) {
+      map[y][x] = wall;
+    }
   }
 
   map[1][1] = player;

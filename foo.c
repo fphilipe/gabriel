@@ -59,20 +59,20 @@ void print_map(int **map, int width, int height) {
 }
 
 int **generate_map(int width, int height) {
-  int p, q;
-  int x = 1;
-  int y = 1;
   int **map = calloc(height, sizeof(int *));
-  for (p = 0; p < height; p++) {
-    map[p] = calloc(width, sizeof(int));
+  for (int y = 0; y < height; y++) {
+    map[y] = calloc(width, sizeof(int));
   }
-  for (p = 0; p < height; p++) {
-    for (q = 0; q < width; q++) {
-      map[p][q] = 1;
+
+  for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++) {
+      map[y][x] = 1;
     }
   }
-  map[y][x] = 2;
-  return dig(map, width, height, x, y);
+
+  map[1][1] = 2;
+
+  return dig(map, width, height, 1, 1);
 }
 
 int **dig(int **map, int width, int height, int x, int y) {

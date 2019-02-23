@@ -45,17 +45,13 @@ int prompt_size(char *label) {
 }
 
 void print_map(int **map, int width, int height) {
-  int x, y;
-  for (y = 0; y < height; y++) {
-    for (x = 0; x < width; x++) {
-      if (map[y][x] == 3) {
-        printf("O");
-      } else if (map[y][x] == 2) {
-        printf("K");
-      } else if (map[y][x] == 1) {
-        printf("#");
-      } else {
-        printf(" ");
+  for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++) {
+      switch (map[y][x]) {
+        case 1:  printf("#"); break;
+        case 2:  printf("K"); break;
+        case 3:  printf("O"); break;
+        default: printf(" ");
       }
     }
     printf("\n");

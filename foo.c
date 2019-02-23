@@ -4,10 +4,6 @@
 #include <string.h>
 
 /*-----------------FUNCTIONS-------------------*/
-int load_dim(const char filename[]);
-
-int** load_map(const char filename[], int dim);
-
 void print_map(int** map, int dim);
 
 int** generate_map(int size);
@@ -18,70 +14,24 @@ int* check_holes(int** map, int m, int n, int i, int j);
 
 int* possible_moves(int** map, int m, int n, int i, int j);
 
-void save_map(int** map, int size, const char filename[]);
-
-void explore(const char filename[], int dim);
+void explore(int** map, int dim);
 /* -------------------MAIN---------------------*/
 
 int main(){
   srand(time(NULL));
-  char file[70] = "/Users/gabri/Desktop/Cexs/Roguelike_Maps/";
-  char map_name[11];
   int size;
 
   // Asking for the size
   printf("Size of the map? (odd number)\n");
   scanf("%d%*c", &size);
 
-  // Generating and displaying map
   int** map = generate_map(size);
-  print_map(map, size);
 
-  // Asking for the filename, and saving the map
-  printf("Name of the map: (max 10 characters)\n");
-  fgets(map_name, 11, stdin);
-  strcat(file, map_name);
-  save_map(map, size, file);
-
-  explore(file, size);
+  explore(map, size);
   return 0;
 }
 
 /*---------------------------------------------*/
-int load_dim(const char filename[]){
-  FILE *fp;
-  int dim;
-
-  fp = fopen(filename, "r");
-  fscanf(fp, "%d", &dim);
-  fclose(fp);
-
-  return dim;
-}
-
-int** load_map(const char filename[], int dim){
-  FILE *fp;
-  int** map;
-  int temp;
-  int i,j;
-
-  fp = fopen(filename, "r");
-  fscanf(fp, "%d", &temp);
-
-  map = malloc(sizeof(int*) * dim);
-  for(i = 0; i < dim; i++){
-    map[i] = malloc(sizeof(int) * dim);
-  }
-
-  for(i = 0; i < dim; i++){
-    for(j = 0; j < dim; j++){
-      fscanf(fp, "%d", &map[i][j]);
-    }
-  }
-  fclose(fp);
-  return map;
-}
-
 void print_map (int** map, int dim) {
   int i,j;
   for (i = 0; i < dim; i++) {
@@ -203,26 +153,9 @@ int* possible_moves(int** map, int m, int n, int i, int j){
   return moves;
 }
 
-void save_map(int** map, int size, const char filename[]){
-  int p, q;
-  FILE *fp;
-
-  fp = fopen(filename, "w");
-  fprintf(fp, "%d\n", size);
-
-  for ( p = 0; p < size; p++) {
-    for ( q = 0; q < size; q++) {
-      fprintf(fp, "%d ", map[p][q]);
-    }
-    fprintf(fp, "\n");
-  }
-  fclose(fp);
-}
-
-void explore(const char filename[], int dim){
+void explore(int** map, int dim){
   char input;
   int i = 1, j = 1;
-  int** map = load_map(filename, dim);
   int* move = calloc(4, sizeof(int));
   while ( input != 'q' ) {
     print_map(map, dim);

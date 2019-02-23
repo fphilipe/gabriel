@@ -3,15 +3,8 @@
 #include <time.h>
 #include <string.h>
 
-#define LEFT  0
-#define UP    1
-#define RIGHT 2
-#define DOWN  3
-
-#define WALL   0
-#define PATH   1
-#define PLAYER 2
-#define TARGET 3
+enum direction { left, up, right, down };
+enum cell_type { wall, path, player, target };
 
 /*-----------------FUNCTIONS-------------------*/
 int prompt_size(char *label);
@@ -58,10 +51,10 @@ void print_map(int **map, int width, int height) {
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       switch (map[y][x]) {
-        case WALL:   printf("#"); break;
-        case PATH:   printf(" "); break;
-        case PLAYER: printf("K"); break;
-        case TARGET: printf("O"); break;
+        case wall:   printf("#"); break;
+        case path:   printf(" "); break;
+        case player: printf("K"); break;
+        case target: printf("O"); break;
       }
     }
     printf("\n");
@@ -74,7 +67,7 @@ int **generate_map(int width, int height) {
     map[y] = calloc(width, sizeof(int));
   }
 
-  map[1][1] = PLAYER;
+  map[1][1] = player;
 
   return dig(map, width, height, 1, 1);
 }
@@ -93,19 +86,19 @@ int **dig(int **map, int width, int height, int x, int y) {
     }
   }
   if (n_to_dig == 0) { //no more possible adjacent possible holes to dig
-    map[y][x] = TARGET;
+    map[y][x] = target;
     return map;
   } else { //random choice among possible ways of digging
     r = rand() % n_to_dig;
     w = where_to_dig[r];
     //digging
     switch (w) {
-      case 0: x -= 2; map[y][x+1] = PATH; break;
-      case 1: y -= 2; map[y+1][x] = PATH; break;
-      case 2: x += 2; map[y][x-1] = PATH; break;
-      case 3: y += 2; map[y-1][x] = PATH; break;
+      case 0: x -= 2; map[y][x+1] = path; break;
+      case 1: y -= 2; map[y+1][x] = path; break;
+      case 2: x += 2; map[y][x-1] = path; break;
+      case 3: y += 2; map[y-1][x] = path; break;
     }
-    map[y][x] = PATH;
+    map[y][x] = path;
     return dig(map, width, height, x, y);
   }
 }
@@ -113,10 +106,10 @@ int **dig(int **map, int width, int height, int x, int y) {
 int *possible_digs(int **map, int width, int height, int x, int y) {
   int *dig = calloc(4, sizeof(int));
 
-  if (x-2 > 0)      { dig[LEFT]  = map[y][x-2] == WALL; }
-  if (y-2 > 0)      { dig[UP]    = map[y-2][x] == WALL; }
-  if (x+2 < width)  { dig[RIGHT] = map[y][x+2] == WALL; }
-  if (y+2 < height) { dig[DOWN]  = map[y+2][x] == WALL; }
+  if (x-2 > 0)      { dig[left]  = map[y][x-2] == wall; }
+  if (y-2 > 0)      { dig[up]    = map[y-2][x] == wall; }
+  if (x+2 < width)  { dig[right] = map[y][x+2] == wall; }
+  if (y+2 < height) { dig[down]  = map[y+2][x] == wall; }
 
   return dig;
 }
@@ -124,10 +117,10 @@ int *possible_digs(int **map, int width, int height, int x, int y) {
 int *possible_moves(int **map, int width, int height, int x, int y) {
   int *moves = calloc(4, sizeof(int));
 
-  if (x-1 > 0)      { moves[LEFT]  = map[y][x-1] == PATH; }
-  if (y-1 > 0)      { moves[UP]    = map[y-1][x] == PATH; }
-  if (x+1 < width)  { moves[RIGHT] = map[y][x+1] == PATH; }
-  if (y+1 < height) { moves[DOWN]  = map[y+1][x] == PATH; }
+  if (x-1 > 0)      { moves[left]  = map[y][x-1] == path; }
+  if (y-1 > 0)      { moves[up]    = map[y-1][x] == path; }
+  if (x+1 < width)  { moves[right] = map[y][x+1] == path; }
+  if (y+1 < height) { moves[down]  = map[y+1][x] == path; }
 
   return moves;
 }
@@ -144,28 +137,28 @@ void explore(int **map, int width, int height) {
     int *can_move = possible_moves(map, width, height, x, y);
     switch (input) {
       case 'a':
-        if (can_move[LEFT]) {
+        if (can_move[left]) {
           x -= 1;
-          map[y][x+1] = PATH;
-          map[y][x] = PLAYER;
+          map[y][x+1] = path;
+          map[y][x] = player;
         } break;
       case 'w':
-        if (can_move[UP]) {
+        if (can_move[up]) {
           y -= 1;
-          map[y+1][x] = PATH;
-          map[y][x] = PLAYER;
+          map[y+1][x] = path;
+          map[y][x] = player;
         } break;
       case 'd':
-        if (can_move[RIGHT]) {
+        if (can_move[right]) {
           x += 1;
-          map[y][x-1] = PATH;
-          map[y][x] = PLAYER;
+          map[y][x-1] = path;
+          map[y][x] = player;
         } break;
       case 's':
-        if (can_move[DOWN]) {
+        if (can_move[down]) {
           y += 1;
-          map[y-1][x] = PATH;
-          map[y][x] = PLAYER;
+          map[y-1][x] = path;
+          map[y][x] = player;
         } break;
       case 'q': break;
       default: continue;

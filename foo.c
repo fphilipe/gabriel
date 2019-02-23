@@ -8,6 +8,11 @@
 #define RIGHT 2
 #define DOWN  3
 
+#define PATH   0
+#define WALL   1
+#define PLAYER 2
+#define TARGET 3
+
 /*-----------------FUNCTIONS-------------------*/
 int prompt_size(char *label);
 
@@ -53,10 +58,10 @@ void print_map(int **map, int width, int height) {
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       switch (map[y][x]) {
-        case 1:  printf("#"); break;
-        case 2:  printf("K"); break;
-        case 3:  printf("O"); break;
-        default: printf(" ");
+        case PATH:   printf(" "); break;
+        case WALL:   printf("#"); break;
+        case PLAYER: printf("K"); break;
+        case TARGET: printf("O"); break;
       }
     }
     printf("\n");
@@ -71,11 +76,11 @@ int **generate_map(int width, int height) {
 
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
-      map[y][x] = 1;
+      map[y][x] = WALL;
     }
   }
 
-  map[1][1] = 2;
+  map[1][1] = PLAYER;
 
   return dig(map, width, height, 1, 1);
 }
@@ -94,19 +99,19 @@ int **dig(int **map, int width, int height, int x, int y) {
     }
   }
   if (n_to_dig == 0) { //no more possible adjacent possible holes to dig
-    map[y][x] = 3;
+    map[y][x] = TARGET;
     return map;
   } else { //random choice among possible ways of digging
     r = rand() % n_to_dig;
     w = where_to_dig[r];
     //digging
     switch (w) {
-      case 0: x -= 2; map[y][x+1] = 0; break;
-      case 1: y -= 2; map[y+1][x] = 0; break;
-      case 2: x += 2; map[y][x-1] = 0; break;
-      case 3: y += 2; map[y-1][x] = 0; break;
+      case 0: x -= 2; map[y][x+1] = PATH; break;
+      case 1: y -= 2; map[y+1][x] = PATH; break;
+      case 2: x += 2; map[y][x-1] = PATH; break;
+      case 3: y += 2; map[y-1][x] = PATH; break;
     }
-    map[y][x] = 0;
+    map[y][x] = PATH;
     return dig(map, width, height, x, y);
   }
 }
@@ -114,10 +119,10 @@ int **dig(int **map, int width, int height, int x, int y) {
 int *possible_digs(int **map, int width, int height, int x, int y) {
   int *dig = calloc(4, sizeof(int));
 
-  if (x-2 > 0)      { dig[LEFT]  = map[y][x-2]; }
-  if (y-2 > 0)      { dig[UP]    = map[y-2][x]; }
-  if (x+2 < width)  { dig[RIGHT] = map[y][x+2]; }
-  if (y+2 < height) { dig[DOWN]  = map[y+2][x]; }
+  if (x-2 > 0)      { dig[LEFT]  = map[y][x-2] == WALL; }
+  if (y-2 > 0)      { dig[UP]    = map[y-2][x] == WALL; }
+  if (x+2 < width)  { dig[RIGHT] = map[y][x+2] == WALL; }
+  if (y+2 < height) { dig[DOWN]  = map[y+2][x] == WALL; }
 
   return dig;
 }
@@ -125,10 +130,10 @@ int *possible_digs(int **map, int width, int height, int x, int y) {
 int *possible_moves(int **map, int width, int height, int x, int y) {
   int *moves = calloc(4, sizeof(int));
 
-  if (x-1 > 0)      { moves[LEFT]  = map[y][x-1] == 0; }
-  if (y-1 > 0)      { moves[UP]    = map[y-1][x] == 0; }
-  if (x+1 < width)  { moves[RIGHT] = map[y][x+1] == 0; }
-  if (y+1 < height) { moves[DOWN]  = map[y+1][x] == 0; }
+  if (x-1 > 0)      { moves[LEFT]  = map[y][x-1] == PATH; }
+  if (y-1 > 0)      { moves[UP]    = map[y-1][x] == PATH; }
+  if (x+1 < width)  { moves[RIGHT] = map[y][x+1] == PATH; }
+  if (y+1 < height) { moves[DOWN]  = map[y+1][x] == PATH; }
 
   return moves;
 }
@@ -147,26 +152,26 @@ void explore(int **map, int width, int height) {
       case 'a':
         if (can_move[LEFT]) {
           x -= 1;
-          map[y][x+1] = 0;
-          map[y][x] = 2;
+          map[y][x+1] = PATH;
+          map[y][x] = PLAYER;
         } break;
       case 'w':
         if (can_move[UP]) {
           y -= 1;
-          map[y+1][x] = 0;
-          map[y][x] = 2;
+          map[y+1][x] = PATH;
+          map[y][x] = PLAYER;
         } break;
       case 'd':
         if (can_move[RIGHT]) {
           x += 1;
-          map[y][x-1] = 0;
-          map[y][x] = 2;
+          map[y][x-1] = PATH;
+          map[y][x] = PLAYER;
         } break;
       case 's':
         if (can_move[DOWN]) {
           y += 1;
-          map[y-1][x] = 0;
-          map[y][x] = 2;
+          map[y-1][x] = PATH;
+          map[y][x] = PLAYER;
         } break;
       case 'q': break;
       default: continue;

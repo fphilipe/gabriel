@@ -24,7 +24,7 @@ int **dig(int **map, int width, int height, int x, int y);
 
 int *possible_digs(int **map, int width, int height, int x, int y);
 
-int *possible_moves(int **map, int width, int height, int x, int y);
+int can_move(int dir, int **map, int width, int height, int x, int y);
 
 void explore(int **map, int width, int height);
 
@@ -125,15 +125,14 @@ int *possible_digs(int **map, int width, int height, int x, int y) {
   return dig;
 }
 
-int *possible_moves(int **map, int width, int height, int x, int y) {
-  int *moves = calloc(4, sizeof(int));
-
-  if (x-1 > 0)      { moves[left]  = map[y][x-1] == path; }
-  if (y-1 > 0)      { moves[up]    = map[y-1][x] == path; }
-  if (x+1 < width)  { moves[right] = map[y][x+1] == path; }
-  if (y+1 < height) { moves[down]  = map[y+1][x] == path; }
-
-  return moves;
+int can_move(int dir, int **map, int width, int height, int x, int y) {
+  switch (dir) {
+    case left:  return (x-1 > 0)      && map[y][x-1] == path;
+    case up:    return (y-1 > 0)      && map[y-1][x] == path;
+    case right: return (x+1 < width)  && map[y][x+1] == path;
+    case down:  return (y+1 < height) && map[y+1][x] == path;
+    default: abort();
+  }
 }
 
 void explore(int **map, int width, int height) {
@@ -145,7 +144,6 @@ void explore(int **map, int width, int height) {
     printf("\nChoose your next action (wasd - q to exit):\n");
     scanf("\n");
     scanf("%1c", &input);
-    int *can_move = possible_moves(map, width, height, x, y);
     switch (input) {
       case keyLeft:
       case keyUp:
@@ -153,7 +151,7 @@ void explore(int **map, int width, int height) {
       case keyDown:
         {
           int dir = directionForKey(input);
-          if (can_move[dir])
+          if (can_move(dir, map, width, height, x, y))
             move(dir, map, &x, &y);
           break;
         }

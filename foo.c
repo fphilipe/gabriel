@@ -3,13 +3,20 @@
 #include <time.h>
 #include <string.h>
 
-enum direction { left, up, right, down };
+enum direction {
+  left = 1,
+  up,
+  right,
+  down
+};
+
 enum cell_type {
   wall   = '#',
   path   = ' ',
   player = 'K',
   target = 'O'
 };
+
 enum keys {
   keyLeft  = 'a',
   keyUp    = 'w',
@@ -39,6 +46,8 @@ void alloc_map(Map *map, int width, int height);
 void free_map(Map *map);
 
 void generate_labyrinth(Map *map);
+
+int random_digging_direction(Map *map, Position *pos);
 
 int can_dig(int dir, Map *map, Position *pos);
 
@@ -119,24 +128,30 @@ void generate_labyrinth(Map *map) {
   map->cells[pos.x][pos.y] = player;
 
   while (1) {
-    int n_to_dig = 0;
-    int where_to_dig[4];
-    for (int dir = 0; dir < 4; dir++) {
-      if (can_dig(dir, map, &pos)) {
-        where_to_dig[n_to_dig] = dir;
-        n_to_dig += 1;
-      }
+    int dir = random_digging_direction(map, &pos);
+    if (!dir) break;
+    // We always dig two cells at a time:
+    dig(dir, map, &pos);
+    dig(dir, map, &pos);
+  }
+
+  map->cells[pos.y][pos.x] = target;
+}
+
+int random_digging_direction(Map *map, Position *pos) {
+  int count = 0;
+  int options[4];
+  for (int dir = left; dir <= down; dir++) {
+    if (can_dig(dir, map, pos)) {
+      options[count] = dir;
+      count += 1;
     }
-    if (n_to_dig == 0) { //no more possible adjacent possible holes to dig
-      map->cells[pos.y][pos.x] = target;
-      break;
-    } else { //random choice among possible ways of digging
-      int r = rand() % n_to_dig;
-      int dir = where_to_dig[r];
-      // We always dig two cells at a time:
-      dig(dir, map, &pos);
-      dig(dir, map, &pos);
-    }
+  }
+
+  if (count == 0) {
+    return 0;
+  } else {
+    return options[rand() % count];
   }
 }
 

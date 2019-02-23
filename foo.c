@@ -17,7 +17,7 @@ int **generate_map(int width, int height);
 
 int **dig(int **map, int width, int height, int x, int y);
 
-int *check_holes(int **map, int width, int height, int x, int y);
+int *possible_digs(int **map, int width, int height, int x, int y);
 
 int *possible_moves(int **map, int width, int height, int x, int y);
 
@@ -87,10 +87,10 @@ int **dig(int **map, int width, int height, int x, int y) {
 
   int where_to_dig[4];
 
-  int *free_to_dig = check_holes(map, width, height, x, y);
+  int *can_dig = possible_digs(map, width, height, x, y);
 
   for (u = 0; u < 4; u++) {
-    if (free_to_dig[u] == 1) {
+    if (can_dig[u] == 1) {
       where_to_dig[n_to_dig] = u;
       n_to_dig += 1;
     }
@@ -113,7 +113,7 @@ int **dig(int **map, int width, int height, int x, int y) {
   }
 }
 
-int *check_holes(int **map, int width, int height, int x, int y) {
+int *possible_digs(int **map, int width, int height, int x, int y) {
   int *dig = calloc(4, sizeof(int));
 
   if (x-2 > 0)      { dig[LEFT]  = map[y][x-2]; }

@@ -34,7 +34,11 @@ int prompt_size(char *label);
 
 void print_map(Map *map);
 
-Map *generate_map(int width, int height);
+void alloc_map(Map *map, int width, int height);
+
+void free_map(Map *map);
+
+void generate_map(Map *map);
 
 void dig(Map *map, Position *pos);
 
@@ -57,9 +61,13 @@ int main() {
 
   int width = prompt_size("Width");
   int height = prompt_size("Height");
-  Map *map = generate_map(width, height);
+  Map map;
+  alloc_map(&map, width, height);
+  generate_map(&map);
 
-  explore(map);
+  explore(&map);
+
+  free_map(&map);
   return 0;
 }
 
@@ -86,9 +94,7 @@ void print_map(Map *map) {
   }
 }
 
-Map *generate_map(int width, int height) {
-  Map *map = malloc(sizeof(*map));
-
+void alloc_map(Map *map, int width, int height) {
   map->width = width;
   map->height = height;
 
@@ -99,12 +105,19 @@ Map *generate_map(int width, int height) {
       map->cells[y][x] = wall;
     }
   }
+}
 
+void free_map(Map *map) {
+  for (int y = 0; y < map->height; y++) {
+    free(map->cells[y]);
+  }
+  free(map->cells);
+}
+
+void generate_map(Map *map) {
   Position pos = { .x = 1, .y = 1 };
   map->cells[pos.x][pos.y] = player;
   dig(map, &pos);
-
-  return map;
 }
 
 void dig(Map *map, Position *pos) {

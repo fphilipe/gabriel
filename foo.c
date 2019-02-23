@@ -8,7 +8,7 @@ int prompt_size(char *label);
 
 void print_map(int **map, int width, int height);
 
-int **generate_map(int size);
+int **generate_map(int width, int height);
 
 int **gen_labirinth(int **map, int width, int height, int i, int j);
 
@@ -61,20 +61,20 @@ void print_map(int **map, int width, int height) {
   }
 }
 
-int **generate_map(int size) {
+int **generate_map(int width, int height) {
   int p, q;
   int i = 1, j = 1;
-  int **map = calloc(size, sizeof(int *));
-  for (p = 0; p < size; p++) {
-    map[p] = calloc(size, sizeof(int));
+  int **map = calloc(height, sizeof(int *));
+  for (p = 0; p < height; p++) {
+    map[p] = calloc(width, sizeof(int));
   }
-  for (p = 0; p < size; p++) {
-    for (q = 0; q < size; q++) {
+  for (p = 0; p < height; p++) {
+    for (q = 0; q < width; q++) {
       map[p][q] = 1;
     }
   }
   map[i][j] = 2;
-  return gen_labirinth(map, size, size, i, j);
+  return gen_labirinth(map, width, height, i, j);
 }
 
 int **gen_labirinth(int **map, int width, int height, int i, int j) {
